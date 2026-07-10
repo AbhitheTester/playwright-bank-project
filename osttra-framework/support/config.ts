@@ -4,9 +4,22 @@ import * as path from 'path';
 export const frameworkRoot = path.resolve(__dirname, '..');
 
 export function loadEnvironment() {
-  const envName = (process.env.ENV || 'sit').toLowerCase();
-  dotenv.config({ path: path.join(frameworkRoot, `.env.${envName}`) });
-  return envName;
+  // Respect any ENV/ROLE provided by the runtime (CI or CLI). Only use the
+  // environment file to populate missing variables.
+  const runtimeEnv = process.env.ENV;
+  const runtimeRole = process.env.ROLE;
+
+  // Choose which .env file to load: prefer runtime ENV if present, otherwise default to 'sit'.
+  const envToLoad = (runtimeEnv || 'sit').toLowerCase();
+
+  // Load the environment file but do NOT override existing runtime vars.
+  dotenv.config({ path: path.join(frameworkRoot, `.env.${envToLoad}`), override: false });
+
+  // Final resolved values: runtime variables take precedence over file values.
+  const finalEnv = (process.env.ENV || envToLoad).toLowerCase();
+  const finalRole = (process.env.ROLE || 'user').toLowerCase();
+
+  return finalEnv;
 }
 
 export const envName = loadEnvironment();
