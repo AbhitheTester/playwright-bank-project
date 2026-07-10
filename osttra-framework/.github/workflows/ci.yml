@@ -1,0 +1,106 @@
+name: Playwright BDD Framework — CI Pipeline
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+  schedule:
+    - cron: '0 1 * * *'   # Nightly full regression at 1AM
+
+env:
+  NODE_VERSION: '18'
+  ENV: sit
+
+jobs:
+  # ─── Job 1: Smoke on every PR ──────────────────────────────────
+  smoke-tests:
+    name: Smoke Tests (PR Gate)
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Run smoke tests
+        run: npm run test:smoke
+        env:
+          BASE_URL:     ${{ secrets.SIT_BASE_URL }}
+          API_BASE_URL: ${{ secrets.SIT_API_URL }}
+          USER_NAME:    ${{ secrets.SIT_USER }}
+          USER_PASS:    ${{ secrets.SIT_PASS }}
+          API_TOKEN:    ${{ secrets.API_TOKEN }}
+          CI:           true
+          HEADLESS:     true
+
+      - name: Upload reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: smoke-report-${{ github.run_number }}
+          path: reports/
+
+  # ─── Job 2: Full regression nightly ────────────────────────────
+  full-regression:
+    name: Full Regression (Nightly)
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule' || github.ref == 'refs/heads/main'
+
+    strategy:
+      matrix:
+        project: [SIT-Chrome, API-Tests]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
+
+      - name: Run ${{ matrix.project }} tests
+        run: npm run test:regression -- --project=${{ matrix.project }}
+        env:
+          BASE_URL:     ${{ secrets.SIT_BASE_URL }}
+          API_BASE_URL: ${{ secrets.API_URL }}
+          USER_NAME:    ${{ secrets.USER }}
+          USER_PASS:    ${{ secrets.PASS }}
+          API_TOKEN:    ${{ secrets.API_TOKEN }}
+          CI:           true
+
+      - name: Generate Allure report
+        if: always()
+        run: npm run report:generate
+
+      - name: Upload Allure results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: allure-${{ matrix.project }}-${{ github.run_number }}
+          path: reports/allure-results/
+
+      - name: Publish Allure to GitHub Pages
+        if: github.ref == 'refs/heads/main' && always()
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: reports/allure-report

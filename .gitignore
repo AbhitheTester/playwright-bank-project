@@ -1,0 +1,22 @@
+# Environment files
+
+.env.*
+
+# Node dependencies
+node_modules/
+
+# Test auth/session artifacts
+osttra-framework/auth/
+
+# Generated reports and test outputs
+osttra-framework/reports/
+osttra-framework/test-results/
+playwright-report/
+
+# OS/editor junk
+.DS_Store
+Thumbs.db
+.vscode/
+
+# Logs
+*.log

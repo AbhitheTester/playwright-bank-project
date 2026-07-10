@@ -1,0 +1,38 @@
+{
+  "name": "osttra-playwright-bdd-framework",
+  "version": "1.0.0",
+  "scripts": {
+    "pretest": "node -e \"require('fs').existsSync('osttra-framework/auth')||require('fs').mkdirSync('osttra-framework/auth', {recursive:true})\"",
+    "test": "node scripts/run-cucumber.js --env=sit --profile=smoke",
+    "test:smoke": "node scripts/run-cucumber.js --env=sit --profile=smoke",
+    "test:regression": "node scripts/run-cucumber.js --env=sit --profile=regression",
+    "test:all": "node scripts/run-cucumber.js --env=sit --profile=default",
+    "test:api": "node scripts/run-cucumber.js --env=sit --profile=api-only",
+    "test:ui": "node scripts/run-cucumber.js --env=sit --profile=default --tags=@ui",
+    "test:trade": "node scripts/run-cucumber.js --env=sit --profile=default --tags=@trade",
+    "test:uat": "node scripts/run-cucumber.js --env=uat --profile=default",
+    "test:uat:smoke": "node scripts/run-cucumber.js --env=uat --profile=smoke",
+    "test:ci": "node scripts/run-cucumber.js --env=sit --profile=smoke --workers=4",
+    "auth:setup": "node scripts/run-cucumber.js --env=sit --setup-only",
+    "typecheck": "tsc --noEmit",
+    "report:allure": "allure generate osttra-framework/reports/allure-results --clean -o osttra-framework/reports/allure-report",
+    "report:open": "allure open osttra-framework/reports/allure-report",
+    "report:cucumber": "node scripts/generate-cucumber-report.js",
+    "report:generate": "npm run report:cucumber && npm run report:allure",
+    "clean:reports": "node -e \"const fs=require('fs'); fs.rmSync('osttra-framework/reports',{recursive:true,force:true})\"",
+    "clean:auth": "node -e \"const fs=require('fs'); fs.rmSync('osttra-framework/auth',{recursive:true,force:true})\"",
+    "clean": "npm run clean:reports"
+  },
+  "devDependencies": {
+    "@cucumber/cucumber": "^10.0.0",
+    "@playwright/test": "^1.44.0",
+    "@types/node": "^20.0.0",
+    "allure-commandline": "^2.29.0",
+    "allure-cucumberjs": "^2.15.0",
+    "allure-playwright": "^2.15.0",
+    "dotenv": "^16.0.0",
+    "multiple-cucumber-html-reporter": "^3.7.0",
+    "ts-node": "^10.9.0",
+    "typescript": "^5.0.0"
+  }
+}

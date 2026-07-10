@@ -1,0 +1,53 @@
+{
+  "default": {
+    "paths": ["features/**/*.feature"],
+    "require": ["steps/**/*.ts", "support/hooks.ts", "support/world.ts"],
+    "requireModule": ["ts-node/register"],
+    "format": [
+      "progress-bar",
+      "@cucumber/pretty-formatter",
+      "json:reports/json/cucumber-default.json",
+      "junit:reports/junit-default.xml",
+      "./support/allure-reporter.js"
+    ]
+  },
+  "smoke": {
+    "paths": ["features/**/*.feature"],
+    "tags": "@smoke and not @api",
+    "require": ["steps/**/*.ts", "support/hooks.ts", "support/world.ts"],
+    "requireModule": ["ts-node/register"],
+    "format": [
+      "progress-bar",
+      "@cucumber/pretty-formatter",
+      "json:reports/json/cucumber-smoke.json",
+      "junit:reports/junit-smoke.xml",
+      "./support/allure-reporter.js"
+    ]
+  },
+  "regression": {
+    "paths": ["features/**/*.feature"],
+    "tags": "@regression",
+    "require": ["steps/**/*.ts", "support/hooks.ts", "support/world.ts"],
+    "requireModule": ["ts-node/register"],
+    "format": [
+      "progress-bar",
+      "@cucumber/pretty-formatter",
+      "json:reports/json/cucumber-regression.json",
+      "junit:reports/junit-regression.xml",
+      "./support/allure-reporter.js"
+    ]
+  },
+  "api-only": {
+    "paths": ["features/api/**/*.feature"],
+    "tags": "@api",
+    "require": ["steps/api/**/*.ts", "support/hooks.ts", "support/world.ts"],
+    "requireModule": ["ts-node/register"],
+    "format": [
+      "progress-bar",
+      "@cucumber/pretty-formatter",
+      "json:reports/json/cucumber-api.json",
+      "junit:reports/junit-api.xml",
+      "./support/allure-reporter.js"
+    ]
+  }
+}
