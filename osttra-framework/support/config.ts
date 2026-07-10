@@ -1,25 +1,27 @@
 import * as dotenv from 'dotenv';
 import * as path from 'path';
+import * as fs from 'fs';
 
 export const frameworkRoot = path.resolve(__dirname, '..');
 
 export function loadEnvironment() {
-  // Respect any ENV/ROLE provided by the runtime (CI or CLI). Only use the
-  // environment file to populate missing variables.
-  const runtimeEnv = process.env.ENV;
-  const runtimeRole = process.env.ROLE;
 
-  // Choose which .env file to load: prefer runtime ENV if present, otherwise default to 'sit'.
+  const runtimeEnv = process.env.ENV;
   const envToLoad = (runtimeEnv || 'sit').toLowerCase();
 
-  // Load the environment file but do NOT override existing runtime vars.
-  dotenv.config({ path: path.join(frameworkRoot, `.env.${envToLoad}`), override: false });
+  const defaultEnv = path.join(frameworkRoot, '.env');
+  const namedEnv = path.join(frameworkRoot, `.env.${envToLoad}`);
 
-  // Final resolved values: runtime variables take precedence over file values.
-  const finalEnv = (process.env.ENV || envToLoad).toLowerCase();
-  const finalRole = (process.env.ROLE || 'user').toLowerCase();
+  const envFile = fs.existsSync(defaultEnv)
+      ? defaultEnv
+      : namedEnv;
 
-  return finalEnv;
+  dotenv.config({
+      path: envFile,
+      override: false
+  });
+
+  return (process.env.ENV || envToLoad).toLowerCase();
 }
 
 export const envName = loadEnvironment();
