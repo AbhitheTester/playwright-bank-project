@@ -27,25 +27,40 @@ pipeline {
             }
         }
 
-        stage('Prepare Environment') {
-            steps {
-                script {
+       stage('Prepare Environment') {
+    steps {
+        script {
 
-                    def envCredential = params.ENVIRONMENT == 'sit' ? 'env-sit' : 'env-uat'
+            def envCredential = params.ENVIRONMENT == 'sit' ? 'env-sit' : 'env-uat'
 
-                    withCredentials([file(credentialsId: envCredential, variable: 'ENV_FILE')]) {
+            withCredentials([file(credentialsId: envCredential, variable: 'ENV_FILE')]) {
 
-                        if (isUnix()) {
-                            sh 'cp "$ENV_FILE" .env'
-                        } else {
-                            bat 'copy "%ENV_FILE%" .env'
-                        }
-
-                    }
-
+                if (isUnix()) {
+                    sh 'cp "$ENV_FILE" osttra-framework/.env'
+                } else {
+                    bat 'copy "%ENV_FILE%" "osttra-framework\\.env"'
                 }
+
             }
+
         }
+    }
+}
+
+
+stage('Verify Environment') {
+    steps {
+        bat 'echo ===== Workspace ====='
+        bat 'dir'
+
+        bat 'echo ===== osttra-framework ====='
+        bat 'dir osttra-framework'
+
+        bat 'echo ===== .env Content ====='
+        bat 'type osttra-framework\\.env'
+    }
+}
+
 
         stage('Install Dependencies') {
             steps {

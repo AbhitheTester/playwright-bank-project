@@ -25,7 +25,15 @@ const envFilePath = fs.existsSync(defaultEnvFile)
     ? defaultEnvFile
     : namedEnvFile;
 
+console.log("Loading env file:", envFilePath);
+console.log("Exists:", fs.existsSync(envFilePath));
+
 dotenv.config({ path: envFilePath });
+
+console.log("ROLE =", process.env.ROLE);
+console.log("USER_NAME =", process.env.USER_NAME);
+console.log("USER_PASS =", process.env.USER_PASS ? "Loaded" : "Missing");
+
 const role = getArg('role', process.env.ROLE || 'user').toLowerCase();
 const browser = getArg('browser', process.env.BROWSER || 'chromium').toLowerCase();
 const workers = getArg('workers', process.env.WORKERS || (process.env.CI === 'true' ? '4' : '2'));
