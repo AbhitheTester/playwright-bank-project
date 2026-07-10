@@ -17,7 +17,14 @@ const getArg = (name, fallback) => {
 const envName = getArg('env', process.env.ENV || 'sit').toLowerCase();
 const profile = getArg('profile', 'default');
 const tags = getArg('tags', '');
-const envFilePath = path.join(frameworkDir, `.env.${envName}`);
+const defaultEnvFile = path.join(frameworkDir, '.env');
+
+const namedEnvFile = path.join(frameworkDir, `.env.${envName}`);
+
+const envFilePath = fs.existsSync(defaultEnvFile)
+    ? defaultEnvFile
+    : namedEnvFile;
+
 dotenv.config({ path: envFilePath });
 const role = getArg('role', process.env.ROLE || 'user').toLowerCase();
 const browser = getArg('browser', process.env.BROWSER || 'chromium').toLowerCase();

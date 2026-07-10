@@ -8,7 +8,11 @@
     "test:regression": "node scripts/run-cucumber.js --env=sit --profile=regression",
     "test:all": "node scripts/run-cucumber.js --env=sit --profile=default",
     "test:api": "node scripts/run-cucumber.js --env=sit --profile=api-only",
-    "test:ui": "node scripts/run-cucumber.js --env=sit --profile=default --tags=@ui",
+   "test:ui:sit":"node scripts/run-cucumber.js --env=sit --profile=default --tags=@ui",
+
+"test:ui:uat":"node scripts/run-cucumber.js --env=uat --profile=default --tags=@ui",
+
+"test:ui":"node scripts/run-cucumber.js --profile=default --tags=@ui",
     "test:trade": "node scripts/run-cucumber.js --env=sit --profile=default --tags=@trade",
     "test:uat": "node scripts/run-cucumber.js --env=uat --profile=default",
     "test:uat:smoke": "node scripts/run-cucumber.js --env=uat --profile=smoke",
